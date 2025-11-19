@@ -23,7 +23,6 @@ export default function AboutMe() {
 
   return (
     <div className="w-full py-16">
-      {/* Sección About mejorada con layout izquierdo-derecho */}
       <motion.section
         className={`container mx-auto px-4 mb-20 transition-all duration-300 ${
           scrolled ? "rounded-2xl mt-8" : ""
@@ -33,7 +32,6 @@ export default function AboutMe() {
         transition={{ duration: 0.7, ease: "easeOut" }}
       >
         <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
-          {/* Texto a la izquierda */}
           <div className="flex-1 flex flex-col items-center">
             <h1 className="text-4xl font-black text-primary mb-6 select-none drop-shadow-lg text-center">
               {aboutUsData.about.title}
@@ -44,7 +42,6 @@ export default function AboutMe() {
               </p>
             </div>
           </div>
-          {/* Etiquetas a la derecha */}
           <div className="flex-1 flex flex-col items-end w-full">
             <ul className="flex flex-wrap md:flex-col gap-4 justify-end text-center">
               {aboutUsData.about.highlights.map((item, idx) => (
@@ -57,7 +54,6 @@ export default function AboutMe() {
         </div>
       </motion.section>
 
-      {/* Sección Equipo mejorada */}
       <motion.section
         className="container mx-auto px-4"
         initial={{ opacity: 0, y: 40 }}
@@ -110,7 +106,6 @@ export default function AboutMe() {
         </div>
       </motion.section>
 
-      {/* Popup Modal */}
       <AnimatePresence>
         {selected !== null && (
           <motion.div

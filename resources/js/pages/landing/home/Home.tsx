@@ -21,7 +21,6 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function Home({ canRegister = true }: { canRegister?: boolean }) {
-    // Animación para secciones al hacer scroll
     const [aboutRef, aboutInView] = useInView({ triggerOnce: false, threshold: 0.15 });
     const [projectRef, projectInView] = useInView({ triggerOnce: false, threshold: 0.15 });
     const [howRef, howInView] = useInView({ triggerOnce: false, threshold: 0.15 });
@@ -77,7 +76,6 @@ export default function Home({ canRegister = true }: { canRegister?: boolean }) 
 
   return (
     <div className="w-full bg-background relative">
-      {/* HERO SECTION */}
       <section className="container mx-auto px-4 py-16 md:py-24 bg-background">
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="w-full lg:w-1/2 flex flex-col items-start space-y-6 animate-on-scroll fade-in-left">
@@ -148,7 +146,6 @@ export default function Home({ canRegister = true }: { canRegister?: boolean }) 
         </div>
       </section>
 
-      {/* ABOUT SECTION */}
       <motion.section
         ref={aboutRef}
         className="w-full py-10 bg-muted"
@@ -199,7 +196,6 @@ export default function Home({ canRegister = true }: { canRegister?: boolean }) 
         </div>
       </motion.section>
 
-      {/* HOW IT WORKS SECTION */}
       <motion.section
         ref={howRef}
         className="py-20 md:py-28 bg-primary text-white relative overflow-hidden"
@@ -237,7 +233,6 @@ export default function Home({ canRegister = true }: { canRegister?: boolean }) 
         </div>
       </motion.section>
 
-      {/* FEATURES SECTION */}
       <motion.section
         ref={featuresRef}
         id="features"
@@ -286,7 +281,6 @@ export default function Home({ canRegister = true }: { canRegister?: boolean }) 
         </div>
       </motion.section>
 
-      {/* CONTACT SECTION */}
       <motion.section
         ref={contactRef}
         className="py-20 md:py-28 bg-primary relative overflow-hidden"

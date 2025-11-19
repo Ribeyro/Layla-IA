@@ -24,7 +24,6 @@ export default function Footer() {
   return (
     <footer className="w-full border-t bg-background text-foreground transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
-        {/* Logo y redes */}
         <div className="flex flex-col items-center md:items-start md:w-1/3 mb-6 md:mb-0">
           <img
             src={getLogo()}
@@ -47,7 +46,6 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        {/* Navegación SPA con animación */}
         <div className="flex flex-col md:flex-row md:gap-16 w-full md:w-2/3 justify-center md:justify-end">
           <div className="mb-8 md:mb-0">
             <h4 className="font-semibold text-base mb-3 text-center md:text-left">Navegación</h4>

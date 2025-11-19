@@ -10,7 +10,6 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí podrías enviar el formulario a tu backend
     setSubmitted(true);
   };
 
