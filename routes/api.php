@@ -2,6 +2,7 @@
 
 use App\Http\Api\Controllers\LoginController;
 use App\Http\Api\Controllers\RegisterController;
+use App\Http\Api\Controllers\ChatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,5 +14,8 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::post('/logout', [LoginController::class, 'logout']);          
+    Route::post('/logout', [LoginController::class, 'logout']);
+
+    // Chat con OpenAI (Layla)
+    Route::post('/chat', [ChatController::class, 'chat']);
 });
