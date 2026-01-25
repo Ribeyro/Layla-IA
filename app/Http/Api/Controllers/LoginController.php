@@ -26,12 +26,19 @@ class LoginController
             ]);
         }
 
-        $deviceName = $request->device_name ?? $request->userAgent() ?? 'unknown';
+        if (!$user->active) {
+            throw ValidationException::withMessages([
+                'email' => ['Your account is inactive.'],
+            ]);
+        }
 
+        $user->update(['last_connection' => now()]);
+
+        $deviceName = $request->device_name ?? $request->userAgent() ?? 'unknown';
         $token = $user->createToken($deviceName)->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('avatar'),
             'token' => $token,
         ]);
     }
