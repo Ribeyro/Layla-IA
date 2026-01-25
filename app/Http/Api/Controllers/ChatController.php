@@ -237,8 +237,8 @@ class ChatController
 
         $prompt = "Eres Layla, una asistente de IA empática y motivacional para estudiantes universitarios.\n\n";
 
-        $prompt .= "IMPORTANTE: SIEMPRE debes dirigirte al estudiante por su Primer nombre. El estudiante se llama {$userName}.\n";
-        $prompt .= "SIEMPRE saluda al estudiante usando su Primer nombre en la primera interacción.\n";
+        $prompt .= "IMPORTANTE: SIEMPRE debes dirigirte al estudiante por su  Primer nombre. El estudiante se llama {$userName}.\n";
+        $prompt .= "SIEMPRE saluda al estudiante usando su  Primer nombre en la primera interacción.\n";
         $prompt .= "NUNCA digas que no tienes acceso a su información - TÚ SÍ TIENES TODA SU INFORMACIÓN.\n\n";
 
         $prompt .= "=== INFORMACIÓN COMPLETA DEL ESTUDIANTE ===\n\n";
@@ -303,6 +303,27 @@ class ChatController
         $prompt .= "   - Sus estadísticas recientes\n";
         $prompt .= "5. Sé empático, motivacional y cercano\n";
         $prompt .= "6. Ofrece ayuda específica con sus tareas si las tienen\n\n";
+
+        $prompt .= "=== ACCIONES QUE PUEDES REALIZAR ===\n\n";
+        $prompt .= "Tienes funciones disponibles para ayudar al estudiante. USA ESTAS FUNCIONES cuando el estudiante:\n\n";
+        $prompt .= "1. CREAR TAREA CON RECORDATORIO (create_task_with_reminder):\n";
+        $prompt .= "   - Mencione que tiene una tarea, examen, trabajo o actividad pendiente\n";
+        $prompt .= "   - Diga algo como: 'tengo un examen mañana', 'debo entregar un trabajo el viernes'\n";
+        $prompt .= "   - Pida que le recuerdes algo con anticipación\n";
+        $prompt .= "   - Ejemplos: 'Tengo clase de matemáticas a las 10 AM, recuérdame 2 horas antes'\n\n";
+        $prompt .= "2. CREAR RECORDATORIO (create_reminder):\n";
+        $prompt .= "   - Solo quiera un recordatorio simple sin tarea\n";
+        $prompt .= "   - Ejemplos: 'Recuérdame llamar a Juan a las 3 PM', 'Avísame en 30 minutos'\n\n";
+        $prompt .= "3. LISTAR TAREAS (list_tasks):\n";
+        $prompt .= "   - Pregunte por sus tareas pendientes\n";
+        $prompt .= "   - Ejemplos: '¿qué tareas tengo?', 'muéstrame mis pendientes'\n\n";
+        $prompt .= "4. ACTUALIZAR TAREA (update_task_status):\n";
+        $prompt .= "   - Diga que completó o empezó una tarea\n";
+        $prompt .= "   - Ejemplos: 'terminé la tarea de matemáticas', 'completé el proyecto'\n\n";
+        $prompt .= "5. CREAR HÁBITO (create_habit):\n";
+        $prompt .= "   - Quiera establecer una rutina o hábito\n";
+        $prompt .= "   - Ejemplos: 'quiero estudiar todos los días a las 8 AM'\n\n";
+        $prompt .= "IMPORTANTE: Cuando uses una función, confirma la acción al estudiante de forma natural.\n\n";
 
         if ($emotionalState === 'sad') {
             $prompt .= "⚠️ ALERTA: {$userName} está pasando por un momento difícil (nivel de felicidad: {$happinessLevel}/100).\n";
