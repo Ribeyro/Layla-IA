@@ -205,7 +205,8 @@ class AIFunctionService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error al crear hábito: ' . $e->getMessage(),
+                'message' => 'Error al
+                : ' . $e->getMessage(),
             ];
         }
     }
@@ -227,6 +228,10 @@ class AIFunctionService
 
     public function getFunctionDefinitions(): array
     {
+        $currentDate = Carbon::now();
+        $todayFormatted = $currentDate->format('Y-m-d');
+        $tomorrowFormatted = $currentDate->copy()->addDay()->format('Y-m-d');
+
         return [
             [
                 'name' => 'create_task_with_reminder',
@@ -244,7 +249,7 @@ class AIFunctionService
                         ],
                         'due_date' => [
                             'type' => 'string',
-                            'description' => 'Fecha y hora de vencimiento en formato ISO 8601 (YYYY-MM-DD HH:mm:ss). Ejemplo: "2026-01-25 10:00:00"',
+                            'description' => "Fecha y hora de vencimiento en formato ISO 8601 (YYYY-MM-DD HH:mm:ss). IMPORTANTE: La fecha actual es {$todayFormatted}. Si el usuario dice 'hoy', usa {$todayFormatted}. Si dice 'mañana', usa {$tomorrowFormatted}. Ejemplo para hoy a las 8 PM: \"{$todayFormatted} 20:00:00\"",
                         ],
                         'priority' => [
                             'type' => 'string',
@@ -285,7 +290,7 @@ class AIFunctionService
                         ],
                         'reminder_datetime' => [
                             'type' => 'string',
-                            'description' => 'Fecha y hora del recordatorio en formato ISO 8601',
+                            'description' => "Fecha y hora del recordatorio en formato ISO 8601 (YYYY-MM-DD HH:mm:ss). IMPORTANTE: La fecha actual es {$todayFormatted}. Si el usuario dice 'hoy', usa {$todayFormatted}. Si dice 'mañana', usa {$tomorrowFormatted}.",
                         ],
                         'type' => [
                             'type' => 'string',
