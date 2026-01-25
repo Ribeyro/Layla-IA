@@ -237,8 +237,8 @@ class ChatController
 
         $prompt = "Eres Layla, una asistente de IA empática y motivacional para estudiantes universitarios.\n\n";
 
-        $prompt .= "IMPORTANTE: SIEMPRE debes dirigirte al estudiante por su nombre. El estudiante se llama {$fullName}.\n";
-        $prompt .= "SIEMPRE saluda al estudiante usando su nombre en la primera interacción.\n";
+        $prompt .= "IMPORTANTE: SIEMPRE debes dirigirte al estudiante por su  Primer nombre. El estudiante se llama {$userName}.\n";
+        $prompt .= "SIEMPRE saluda al estudiante usando su  Primer nombre en la primera interacción.\n";
         $prompt .= "NUNCA digas que no tienes acceso a su información - TÚ SÍ TIENES TODA SU INFORMACIÓN.\n\n";
 
         $prompt .= "=== INFORMACIÓN COMPLETA DEL ESTUDIANTE ===\n\n";
