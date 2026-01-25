@@ -97,13 +97,13 @@ class ChatController
                     'temperature' => 0.7,
                 ]);
 
-                $aiResponse = $finalResult->choices[0]->message->content;
+                $aiResponse = $this->cleanMarkdownFormat($finalResult->choices[0]->message->content);
 
                 // Guardar info sobre la función ejecutada en el mensaje
                 $functionExecutedInfo = " [Función ejecutada: {$functionName}]";
             } else {
                 // No se llamó a ninguna función, usar la respuesta directa
-                $aiResponse = $responseMessage->content;
+                $aiResponse = $this->cleanMarkdownFormat($responseMessage->content);
                 $functionExecutedInfo = '';
             }
 
@@ -237,6 +237,18 @@ class ChatController
 
         $prompt = "Eres Layla, una asistente de IA empática y motivacional para estudiantes universitarios.\n\n";
 
+        // Fecha y hora actual para contexto temporal
+        $currentDate = Carbon::now();
+        $prompt .= "=== FECHA Y HORA ACTUAL ===\n";
+        $prompt .= "- Fecha actual: " . $currentDate->format('d/m/Y') . "\n";
+        $prompt .= "- Hora actual: " . $currentDate->format('H:i') . "\n";
+        $prompt .= "- Día de la semana: " . $currentDate->locale('es')->dayName . "\n";
+        $prompt .= "- Año actual: " . $currentDate->year . "\n\n";
+        $prompt .= "IMPORTANTE SOBRE FECHAS: Cuando el usuario mencione 'hoy', 'mañana', 'esta semana', etc., ";
+        $prompt .= "SIEMPRE usa la fecha actual ({$currentDate->format('Y-m-d')}) como referencia. ";
+        $prompt .= "Por ejemplo, si hoy es {$currentDate->format('d/m/Y')} y el usuario dice 'hoy a las 8 PM', ";
+        $prompt .= "la fecha debe ser {$currentDate->format('Y-m-d')} 20:00:00.\n\n";
+
         $prompt .= "IMPORTANTE: SIEMPRE debes dirigirte al estudiante por su  Primer nombre. El estudiante se llama {$userName}.\n";
         $prompt .= "SIEMPRE saluda al estudiante usando su  Primer nombre en la primera interacción.\n";
         $prompt .= "NUNCA digas que no tienes acceso a su información - TÚ SÍ TIENES TODA SU INFORMACIÓN.\n\n";
@@ -354,6 +366,40 @@ class ChatController
                 'content' => $message->content,
             ];
         })->toArray();
+    }
+
+    private function cleanMarkdownFormat(string $text): string
+    {
+        // Eliminar negritas **texto** o __texto__
+        $text = preg_replace('/\*\*(.*?)\*\*/', '$1', $text);
+        $text = preg_replace('/__(.*?)__/', '$1', $text);
+
+        // Eliminar cursivas *texto* o _texto_
+        $text = preg_replace('/\*(.*?)\*/', '$1', $text);
+        $text = preg_replace('/_(.*?)_/', '$1', $text);
+
+        // Eliminar encabezados markdown (# ## ### etc.)
+        $text = preg_replace('/^#{1,6}\s*/m', '', $text);
+
+        // Eliminar listas con viñetas (- o *)
+        $text = preg_replace('/^[\-\*]\s+/m', '', $text);
+
+        // Eliminar código inline `texto`
+        $text = preg_replace('/`(.*?)`/', '$1', $text);
+
+        // Eliminar bloques de código ```texto```
+        $text = preg_replace('/```[\s\S]*?```/', '', $text);
+
+        // Eliminar enlaces [texto](url) -> texto
+        $text = preg_replace('/\[(.*?)\]\(.*?\)/', '$1', $text);
+
+        // Convertir saltos de línea a espacios
+        $text = str_replace(["\r\n", "\r", "\n"], ' ', $text);
+
+        // Limpiar múltiples espacios en blanco
+        $text = preg_replace('/\s+/', ' ', $text);
+
+        return trim($text);
     }
 
     private function updateDailyStatistics(int $userId): void
