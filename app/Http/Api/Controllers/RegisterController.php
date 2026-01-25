@@ -3,9 +3,11 @@
 namespace App\Http\Api\Controllers;
 
 use App\Models\User;
+use App\Models\Avatar;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 
 class RegisterController
@@ -14,26 +16,58 @@ class RegisterController
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'birth_date' => ['sometimes', 'date'],
+            'university' => ['sometimes', 'string', 'max:200'],
+            'career' => ['sometimes', 'string', 'max:200'],
+            'cycle' => ['sometimes', 'integer', 'min:1', 'max:12'],
             'device_name' => ['sometimes', 'string', 'max:255'],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ]);
+        DB::beginTransaction();
 
-        event(new Registered($user));
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => $request->password,
+                'birth_date' => $request->birth_date,
+                'university' => $request->university,
+                'career' => $request->career,
+                'cycle' => $request->cycle,
+                'active' => true,
+            ]);
 
-        $deviceName = $request->device_name ?? $request->userAgent() ?? 'unknown';
+            Avatar::create([
+                'user_id' => $user->id,
+                'emotional_state' => 'neutral',
+                'happiness_level' => 50,
+                'streak_days' => 0,
+                'motivational_message' => '¡Bienvenido! Estoy aquí para acompañarte en tu camino académico.',
+            ]);
 
-        $token = $user->createToken($deviceName)->plainTextToken;
+            event(new Registered($user));
 
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
+            $deviceName = $request->device_name ?? $request->userAgent() ?? 'unknown';
+            $token = $user->createToken($deviceName)->plainTextToken;
+
+            DB::commit();
+
+            return response()->json([
+                'user' => $user->load('avatar'),
+                'token' => $token,
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al crear usuario: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }
