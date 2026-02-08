@@ -206,7 +206,6 @@ class ChatController
         return [
             'user' => [
                 'name' => $user->name,
-                'last_name' => $user->last_name,
                 'university' => $user->university,
                 'career' => $user->career,
                 'cycle' => $user->cycle,
@@ -229,8 +228,6 @@ class ChatController
     private function buildSystemPrompt(array $context): string
     {
         $userName = $context['user']['name'] ?? 'estudiante';
-        $lastName = $context['user']['last_name'] ?? '';
-        $fullName = trim($userName . ' ' . $lastName);
         $emotionalState = $context['avatar']['emotional_state'] ?? 'neutral';
         $happinessLevel = $context['avatar']['happiness_level'] ?? 50;
         $streakDays = $context['avatar']['streak_days'] ?? 0;
@@ -249,14 +246,13 @@ class ChatController
         $prompt .= "Por ejemplo, si hoy es {$currentDate->format('d/m/Y')} y el usuario dice 'hoy a las 8 PM', ";
         $prompt .= "la fecha debe ser {$currentDate->format('Y-m-d')} 20:00:00.\n\n";
 
-        $prompt .= "IMPORTANTE: SIEMPRE debes dirigirte al estudiante por su  Primer nombre. El estudiante se llama {$userName}.\n";
-        $prompt .= "SIEMPRE saluda al estudiante usando su  Primer nombre en la primera interacción.\n";
+        $prompt .= "IMPORTANTE: El estudiante se llama {$userName}. SOLO usa este nombre, NUNCA uses apellidos.\n";
+        $prompt .= "SIEMPRE dirígete al estudiante SOLO por su nombre: {$userName}.\n";
         $prompt .= "NUNCA digas que no tienes acceso a su información - TÚ SÍ TIENES TODA SU INFORMACIÓN.\n\n";
 
-        $prompt .= "=== INFORMACIÓN COMPLETA DEL ESTUDIANTE ===\n\n";
+        $prompt .= "=== INFORMACIÓN DEL ESTUDIANTE ===\n\n";
         $prompt .= "DATOS PERSONALES:\n";
-        $prompt .= "- Nombre completo: {$fullName}\n";
-        $prompt .= "- Primer nombre: {$userName}\n";
+        $prompt .= "- Nombre: {$userName}\n";
 
         if (!empty($context['user']['university'])) {
             $prompt .= "- Universidad: {$context['user']['university']}\n";
@@ -316,26 +312,69 @@ class ChatController
         $prompt .= "5. Sé empático, motivacional y cercano\n";
         $prompt .= "6. Ofrece ayuda específica con sus tareas si las tienen\n\n";
 
-        $prompt .= "=== ACCIONES QUE PUEDES REALIZAR ===\n\n";
-        $prompt .= "Tienes funciones disponibles para ayudar al estudiante. USA ESTAS FUNCIONES cuando el estudiante:\n\n";
-        $prompt .= "1. CREAR TAREA CON RECORDATORIO (create_task_with_reminder):\n";
-        $prompt .= "   - Mencione que tiene una tarea, examen, trabajo o actividad pendiente\n";
-        $prompt .= "   - Diga algo como: 'tengo un examen mañana', 'debo entregar un trabajo el viernes'\n";
-        $prompt .= "   - Pida que le recuerdes algo con anticipación\n";
-        $prompt .= "   - Ejemplos: 'Tengo clase de matemáticas a las 10 AM, recuérdame 2 horas antes'\n\n";
-        $prompt .= "2. CREAR RECORDATORIO (create_reminder):\n";
-        $prompt .= "   - Solo quiera un recordatorio simple sin tarea\n";
-        $prompt .= "   - Ejemplos: 'Recuérdame llamar a Juan a las 3 PM', 'Avísame en 30 minutos'\n\n";
-        $prompt .= "3. LISTAR TAREAS (list_tasks):\n";
-        $prompt .= "   - Pregunte por sus tareas pendientes\n";
-        $prompt .= "   - Ejemplos: '¿qué tareas tengo?', 'muéstrame mis pendientes'\n\n";
-        $prompt .= "4. ACTUALIZAR TAREA (update_task_status):\n";
-        $prompt .= "   - Diga que completó o empezó una tarea\n";
-        $prompt .= "   - Ejemplos: 'terminé la tarea de matemáticas', 'completé el proyecto'\n\n";
-        $prompt .= "5. CREAR HÁBITO (create_habit):\n";
-        $prompt .= "   - Quiera establecer una rutina o hábito\n";
-        $prompt .= "   - Ejemplos: 'quiero estudiar todos los días a las 8 AM'\n\n";
-        $prompt .= "IMPORTANTE: Cuando uses una función, confirma la acción al estudiante de forma natural.\n\n";
+        $prompt .= "=== FUNCIONES DISPONIBLES (CRUD COMPLETO) ===\n\n";
+        $prompt .= "Tienes funciones para gestionar TAREAS, HABITOS y RECORDATORIOS. USA LA FUNCION APROPIADA segun lo que pida el estudiante:\n\n";
+
+        $prompt .= "--- TAREAS ---\n";
+        $prompt .= "- create_task_with_reminder: Crear tarea nueva (con o sin recordatorio)\n";
+        $prompt .= "  Ejemplos: 'tengo examen manana', 'registra una reunion', 'crea una tarea'\n";
+        $prompt .= "- list_tasks: Ver lista de tareas\n";
+        $prompt .= "  Ejemplos: 'que tareas tengo', 'muestrame mis pendientes', 'ver mis tareas'\n";
+        $prompt .= "- get_task: Ver detalles de una tarea especifica\n";
+        $prompt .= "  Ejemplos: 'detalles de la tarea 5', 'info de mi tarea'\n";
+        $prompt .= "- update_task: Modificar una tarea (titulo, fecha, prioridad, estado, etc)\n";
+        $prompt .= "  Ejemplos: 'cambia la fecha de la tarea 3', 'marca como completada', 'actualiza el titulo'\n";
+        $prompt .= "- delete_task: Eliminar una tarea\n";
+        $prompt .= "  Ejemplos: 'elimina la tarea 2', 'borra mi tarea de matematicas'\n\n";
+
+        $prompt .= "--- HABITOS ---\n";
+        $prompt .= "- create_habit: Crear habito nuevo\n";
+        $prompt .= "  Ejemplos: 'quiero crear el habito de estudiar', 'nuevo habito de ejercicio'\n";
+        $prompt .= "- list_habits: Ver lista de habitos\n";
+        $prompt .= "  Ejemplos: 'que habitos tengo', 'muestrame mis rutinas'\n";
+        $prompt .= "- get_habit: Ver detalles de un habito\n";
+        $prompt .= "  Ejemplos: 'detalles del habito 1'\n";
+        $prompt .= "- update_habit: Modificar un habito\n";
+        $prompt .= "  Ejemplos: 'cambia la hora del habito', 'desactiva el habito 2'\n";
+        $prompt .= "- delete_habit: Eliminar un habito\n";
+        $prompt .= "  Ejemplos: 'elimina el habito 3', 'borra mi habito de lectura'\n";
+        $prompt .= "- complete_habit: Marcar habito como completado hoy\n";
+        $prompt .= "  Ejemplos: 'complete mi habito de ejercicio', 'ya hice mi rutina'\n\n";
+
+        $prompt .= "--- RECORDATORIOS ---\n";
+        $prompt .= "- create_reminder: Crear recordatorio\n";
+        $prompt .= "  Ejemplos: 'recuerdame llamar a las 3', 'ponme un recordatorio'\n";
+        $prompt .= "- list_reminders: Ver lista de recordatorios\n";
+        $prompt .= "  Ejemplos: 'que recordatorios tengo', 'mis alarmas pendientes'\n";
+        $prompt .= "- get_reminder: Ver detalles de un recordatorio\n";
+        $prompt .= "- update_reminder: Modificar un recordatorio\n";
+        $prompt .= "  Ejemplos: 'cambia la hora del recordatorio', 'actualiza el mensaje'\n";
+        $prompt .= "- delete_reminder: Eliminar un recordatorio\n";
+        $prompt .= "  Ejemplos: 'elimina el recordatorio 1', 'cancela mi alarma'\n\n";
+
+        $prompt .= "=== REGLAS PARA ELIMINAR Y ACTUALIZAR ===\n\n";
+
+        $prompt .= "--- ELIMINACION (requiere confirmacion) ---\n";
+        $prompt .= "PASO 1: Si el usuario dice 'elimina/borra [algo]' SIN un ID numerico:\n";
+        $prompt .= "   -> Lista los registros para mostrar los IDs disponibles\n";
+        $prompt .= "   -> Pregunta: 'Cual quieres eliminar? Dime el ID o escribe: confirmo eliminar [ID]'\n\n";
+        $prompt .= "PASO 2: EJECUTA la eliminacion SOLO cuando el usuario:\n";
+        $prompt .= "   -> Diga un ID numerico explicito: 'el 5', 'la 7', 'elimina el 3'\n";
+        $prompt .= "   -> Use palabras de confirmacion: 'confirmo', 'si elimina', 'dale', 'ok elimina', 'hazlo'\n";
+        $prompt .= "   -> Escriba: 'confirmo eliminar [ID]' o 'si, elimina el [ID]'\n\n";
+        $prompt .= "IMPORTANTE: Cuando el usuario responda con un ID (ej: '5', 'el 5', 'la tarea 5'), EJECUTA delete_task INMEDIATAMENTE. NO vuelvas a preguntar.\n\n";
+
+        $prompt .= "--- ACTUALIZACION (sin confirmacion) ---\n";
+        $prompt .= "Si el usuario dice 'actualiza/cambia/modifica [algo]':\n";
+        $prompt .= "   -> Si da un ID: Ejecuta update_task/update_habit/update_reminder directamente\n";
+        $prompt .= "   -> Si NO da ID: Lista los registros, cuando responda con ID, ejecuta la actualizacion\n";
+        $prompt .= "   -> NO pidas confirmacion para actualizar, solo ejecuta\n\n";
+
+        $prompt .= "--- EJEMPLOS ---\n";
+        $prompt .= "Usuario: 'elimina mi reunion' -> Tu: lista tareas, pregunta cual\n";
+        $prompt .= "Usuario: 'el 5' -> Tu: EJECUTA delete_task(task_id=5) AHORA\n";
+        $prompt .= "Usuario: 'elimina la tarea 3' -> Tu: EJECUTA delete_task(task_id=3) AHORA\n";
+        $prompt .= "Usuario: 'actualiza la tarea 2, cambia fecha a manana' -> Tu: EJECUTA update_task AHORA\n\n";
 
         if ($emotionalState === 'sad') {
             $prompt .= "⚠️ ALERTA: {$userName} está pasando por un momento difícil (nivel de felicidad: {$happinessLevel}/100).\n";
