@@ -32,7 +32,7 @@ class ReminderController
     {
         $request->validate([
             'task_id' => ['nullable', 'exists:tasks,id'],
-            'reminder_datetime' => ['required', 'date', 'after:now'],
+            'reminder_datetime' => ['required', 'date', 'after_or_equal:now'],
             'message' => ['required', 'string'],
             'type' => ['required', 'in:voice,notification,both'],
         ]);
